@@ -1,2 +1,5 @@
-all
-	gcc -g main.c -o DSSimul
+all:
+	gcc -g main.c list.o -o DSSimul
+
+clean:
+	rm DSSimul
