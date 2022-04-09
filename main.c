@@ -5,43 +5,18 @@
 #include "list.h"
 #include "cscan.h"
 #include "scan.h"
-#include "sstf.h"
+#include "fn.h"
 
-List* list_rand_int;
+List* list_fcfs;
 List* list_sorted;
 List* list_cscan;
 List* list_scan;
-List* list_sstf;
 
-/**
- * @brief comparator function that compares two integer pointers
- * 
- * @param item 
- * @param comp 
- * @return true 
- * @return false 
- */
-bool list_comparator(void* item, void* comp){
-    // int* item1 = (int*) item;
-    // int* item2 = (int*) comp;
-    int item1 = *(int*) item;
-    int item2 = *(int*) comp;
+// Node* head;
+int* rand_int;
+int* sorted;
 
-    // printf("val1 %d, val2 %d\t\t\n", item1, item2);
-    return item1 == item2;
-}
 
-int int_compare(const void *a, const void *b){
-    int int_a = *(int *)a;
-    int int_b = *(int *)b;
-
-    // return -1 if a < b, otherwise 1
-    if(int_a < int_b){
-        return -1;
-    }else{
-        return 1;
-    }
-}
 
 /**
  * @brief Create a list of at least 50 random integers
@@ -50,61 +25,84 @@ int int_compare(const void *a, const void *b){
 void initialize_lists(){
     srand(time(NULL));
 
-    list_rand_int = List_create();
+    list_fcfs = List_create();
     list_sorted = List_create();
+    
 
-    if(list_rand_int == NULL || list_sorted == NULL){
-        perror("Failed to create a list of random integers\n.");
+    if(list_fcfs == NULL || list_sorted == NULL){
+        perror("Failed to create list_fcfs/list_sorted\n.");
         return;
     }
 
     int total = rand() % 150 + 50;
-    int rand_int[total];
+    // int total = rand() % 10 + 1;
+    // int total = 5;
+    rand_int = (int*)malloc(total*sizeof(int));
+    sorted = (int*)malloc(total*sizeof(int));
 
     // printf("total: %d\n\n", total);
 
     COMPARATOR_FN pComparatorFn = &list_comparator;
     int i = 0;
-    while(List_count(list_rand_int) != total){
+    // printf("\nfcfs: \n");
+    while(List_count(list_fcfs) != total){
         int num = rand() % 200;
-        List_first(list_rand_int);
-        if(List_search(list_rand_int, pComparatorFn, &num) == NULL){
-            rand_int[i] = num;
-            List_append(list_rand_int, &rand_int[i]);
-            // printf("\n\ni\t\t%d\n\n", i);
+        List_first(list_fcfs);
+        if(List_search(list_fcfs, pComparatorFn, &num) == NULL){
+            *(rand_int+i) = num;
+            *(sorted+i) = num;
+            List_append(list_fcfs, rand_int+i);
+            // printf("%d ", *(rand_int + i));
             i++;
         }
         
     }
-    // printf("\n\ncount: %d\n", List_count(list_rand_int));
-    // printf("total: %d\n", total);
+    rand_int = rand_int;
 
-    qsort((int*)rand_int, total, sizeof(int), int_compare);
+    qsort(sorted, total, sizeof(int), int_compare);
     for(int i = 0; i < total; i++){
-        List_append(list_sorted, &rand_int[i]);
-        // printf("%d, ", rand_int[i]);
+        List_append(list_sorted, sorted+i);
+        // printf("%d ", *(rand_int+i));
+    }
+    // printf("\n\n%d\n", List_count(list_sorted));
+
+    List_first(list_sorted);
+    List_first(list_fcfs);
+    
+    printf("\nfcfs: \n");
+    for(int i = 0; i < total; i++){
+        printf("%d ", *(int*)List_curr(list_fcfs));
+        List_next(list_fcfs);
     }
 
-
-    // while(List_count(list_sorted) != 0){
-    //     List_first(list_sorted);
-    //     printf("%d, ", *(int*)List_remove(list_sorted));
-    // }
+    printf("\n\nsorted: \n");
+    for(int i = 0; i < total; i++){
+        printf("%d ", *(int*)List_curr(list_sorted));
+        List_next(list_sorted);
+    }
+    printf("\n\n");
 }
 
 
 
-void sort_random_list(){
-    
+void list_item_free(void* pItem){
+    pItem = NULL;
 }
 
 int main(){
     initialize_lists();
-    // List_first(list_rand_int);
-    Node* head = List_remove(list_rand_int);    // first item in the list
+    Node* head = List_first(list_fcfs);    // first item in the list = head
+    // printf("\nhead: %p\n", List_first(list_fcfs));
+    // printf("\nhead: %p\n", head);
+    // printf("\nhead: %d\n", *(int*)head);
 
-    // sort list_rand_int and pass it to disk scheduling function
+    // sort list_fcfs and pass it to disk scheduling function
+    list_scan = disk_scan(list_sorted, head);
+    list_cscan = disk_cscan(list_sorted, head);
     
+    
+    // List_free(list_fcfs, &list_item_free);
+    // List_free(list_sorted, &list_item_free);
 
     return 0;
 }
