@@ -125,35 +125,79 @@ int longestDelayLoop(List* list, int next_fcfs){
     return delay;
 }
 
+int delayList(List *list, int currNum) {
+    int delay = 0;
+    while(true){
+        if(*(int*)List_curr(list) == currNum){
+            if(delay != 0){
+                delay--;
+                }
+            List_first(list);
+            break;
+        }
+        else{
+            List_next(list);
+            delay++;
+        }
+    }
+    return delay;
+}
+
+int delay_fcfs(List *list, int currNum) {
+    List_first(list);
+    int delay = 0;
+    while(true){
+        if(*(int*)List_curr(list) == currNum){
+            if(delay != 0){
+                delay--;
+            }
+            break;
+        }
+        else{
+            delay++;
+            List_next(list);
+        }
+    }
+    return delay;
+}
+
 int longestDelay(List* list){
     int largestDelay = 0;
     List_first(list);
     List_first(list_fcfs);
-    while(List_next(list_fcfs) != NULL){
-        //reset fcfs position
-        List_prev(list_fcfs);
-
-        int curr_fcfs = *(int*)List_curr(list_fcfs);
-        int next_fcfs = *(int*)List_next(list_fcfs);
-        if(list == list_fcfs){
-            List_prev(list);
+    while(List_curr(list_fcfs) != NULL){
+        int currNum = *(int*)List_curr(list_fcfs);
+        int delayAlgo = delayList(list, currNum);
+        int delayFCFS = delay_fcfs(list_fcfs, currNum);
+        int delayDifference = delayAlgo - delayFCFS;
+        if(delayDifference >= largestDelay){
+            largestDelay = delayDifference;
         }
-        int currValue = *(int*)List_curr(list);
-        bool correctPos = (List_search(list, pComparatorFn, &curr_fcfs) != NULL);
-        if(correctPos){
-            int delay = longestDelayLoop(list, next_fcfs);
-            if(delay >= largestDelay){
-                largestDelay = delay;
-            }
-        }
-        else{
-            perror("Cannot find fcfs value in the algorithm!!\n");
-        }
+        List_next(list_fcfs);
     }
     return largestDelay;
 }
 
+float averageDelay(List* list){
+    List_first(list);
+    List_first(list_fcfs);
+    float delayCount = 0;
+    float totalDelay = 0;
+    while(List_curr(list_fcfs) != NULL){
 
+        int currNum = *(int*)List_curr(list_fcfs);
+        int delayAlgo = delayList(list, currNum);
+        int delayFCFS = delay_fcfs(list_fcfs, currNum);
+        int delayDifference = delayAlgo - delayFCFS;
+        if(delayDifference > 0){
+            totalDelay += delayDifference;
+            delayCount++;
+        }
+        List_next(list_fcfs);
+    }
+    float averageDelay = totalDelay/delayCount;
+    return averageDelay;
+}
 
 int main(){
     initialize_lists();
@@ -175,9 +219,14 @@ int main(){
     printf("  - SCAN: %d\n", longestDelay(list_scan));
     printf("  - CSCAN: %d\n", longestDelay(list_cscan));
 
+    printf("Average track delay for each algorithm compared to FCFS:\n");
+    printf("  - SCAN: %.1f\n", averageDelay(list_scan));
+    printf("  - CSCAN: %.1f\n", averageDelay(list_cscan));
     
      List_free(list_fcfs, &list_item_free);
      List_free(list_sorted, &list_item_free);
+     List_free(list_scan, &list_item_free);
+     List_free(list_cscan, &list_item_free);
 
     return 0;
 }
