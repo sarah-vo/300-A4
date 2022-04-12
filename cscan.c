@@ -33,17 +33,12 @@ List* disk_cscan(List* plist, Node* phead){
         return NULL;
     }
 
-    // printf("head: %d\n\n", *(int*)phead);
-
-
     int* curr = (int*)List_curr(plist);  // curr = head
     List_append(list_cscan, List_curr(plist));   // add curr into the list_cscan
     List_prev(list_cscan);
     
     bool left_dir = true;           // bool for direction
     bool scan = true;               // scan through plist
-    
-    // printf("curr: %d\n", *(int*)curr);
 
     while(scan){
         curr = List_prev(plist);    // scanning to the left
@@ -51,7 +46,6 @@ List* disk_cscan(List* plist, Node* phead){
         if(curr == NULL){   // if pointing beyond the start, set curr -> right-most element
             curr = List_last(plist);
             List_append(list_cscan, curr);
-            // printf("curr: %d\n", *(int*)curr);
         }else{
             if(*(int*)curr == *(int*)phead){
                 scan = false;
@@ -59,22 +53,10 @@ List* disk_cscan(List* plist, Node* phead){
                 List_append(list_cscan, curr);
             }
         }
-
-        // if(*(int*)curr == *(int*)phead){ 
-        //     scan = false;
-        // }else{
-        //     if(curr == NULL){     // if pointing beyond the start, set curr -> right-most element
-        //         curr = List_last(plist);
-        //         printf("curr: %d\n", *(int*)curr);
-        //     }
-        //     List_append(list_cscan, curr);
-        // }
-        // printf("curr: %d\n", *(int*)curr);
     }
 
-    // printf("scan size: %d\n", List_count(list_cscan));
     List_first(list_cscan);
-    printf("cscan: \n");
+    printf("CSCAN: \n");
     for(int i = 0; i < List_count(list_cscan); i++){
         printf("%d ", *(int*)(List_curr(list_cscan)));
         List_next(list_cscan);

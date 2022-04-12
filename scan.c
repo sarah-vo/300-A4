@@ -33,9 +33,6 @@ List* disk_scan(List* plist, Node* phead){
         return NULL;
     }
 
-    printf("head: %d\n\n", *(int*)phead);
-
-
     int* curr = (int*)List_curr(plist);  // curr = head
     List_append(list_scan, List_curr(plist));   // add curr into the list_scan
     
@@ -64,9 +61,8 @@ List* disk_scan(List* plist, Node* phead){
         }
     }
 
-    // printf("scan size: %d\n", List_count(list_scan));
     List_first(list_scan);
-    printf("Scan: \n");
+    printf("\n\nSCAN: \n");
     for(int i = 0; i < List_count(list_scan); i++){
         printf("%d ", *(int*)(List_curr(list_scan)));
         List_next(list_scan);

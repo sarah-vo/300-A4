@@ -11,15 +11,19 @@
  * @return false 
  */
 bool list_comparator(void* item, void* comp){
-    // int* item1 = (int*) item;
-    // int* item2 = (int*) comp;
     int* item1 = (int*) item;
     int* item2 = (int*) comp;
 
-    // printf("val1 %d, val2 %d\t\t\n", item1, item2);
     return *item1 == *item2;
 }
 
+/**
+ * @brief compare two integers (for qsort)
+ * 
+ * @param a 
+ * @param b 
+ * @return int 
+ */
 int int_compare(const void *a, const void *b){
     int int_a = *(int *)a;
     int int_b = *(int *)b;
